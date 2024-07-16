@@ -9,7 +9,7 @@ import (
 
 const (
 	WhisperPath = "/Users/michael/Code/whisper.cpp/main"
-	ModelPath   = "/Users/michael/Code/whisper.cpp/models/ggml-medium.en.bin"
+	ModelPath   = "/Users/michael/Code/whisper.cpp/models/ggml-small.en.bin"
 )
 
 func main() {
