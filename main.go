@@ -84,7 +84,7 @@ func main() {
 		defer file.Close()
 
 		for _, chunk := range chunks {
-			payload := fmt.Sprintf(`{"model":"llama3","system":"Split this text into paragraphs. Reply with the paragraphs only. Do not change the text at all.","prompt":%q,"stream":false,"options":{"num_ctx":8000}}`, chunk)
+			payload := fmt.Sprintf(`{"model":"llama3","system":"Split this text into paragraphs. Reply with the paragraphs only. Do not change the text at all.","prompt":%q,"stream":false,"options":{"num_ctx":8000,"temperature":0.1}}`, chunk)
 			req, _ := http.NewRequest("POST", "http://localhost:11434/api/generate", strings.NewReader(payload))
 			req.Header.Set("Content-Type", "application/json")
 
