@@ -1,6 +1,6 @@
 # Subber
 
-This is a Golang CLI tool for generating transcripts of video files. It uses ffmpeg, whisper and ollama.
+This is a Golang CLI tool for generating transcripts of video and audio files. It wraps FFmpeg and Whisper.
 
 ## Usage
 
@@ -10,7 +10,7 @@ go run *.go [--format] <file>
 
 ### Options
 
-- `--format`: Optional flag to trigger formatting the transcript into paragraphs using an LLM
+- `--format`: Optional flag to trigger formatting the transcript into paragraphs using basic topic analysis with TF-IDF
 
 ### Example
 
@@ -22,7 +22,7 @@ This command will:
 
 1. Convert `video.mp4` to a WAV
 2. Transcribe the audio using Whisper
-3. Format the transcript into paragraphs using an LLM
+3. Format the transcript into paragraphs using topic analysis with TF-IDF
 4. Save the formatted transcript to `formatted_transcript.txt`
 
 ## Installation

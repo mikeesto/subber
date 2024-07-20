@@ -1,14 +1,12 @@
 package main
 
 import (
-	"encoding/json"
 	"flag"
 	"fmt"
-	"io"
-	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"strings"
 )
 
@@ -62,7 +60,10 @@ func main() {
 		fmt.Printf("Error reading transcript file: %v\n", err)
 		return
 	}
+
 	transcript := strings.ReplaceAll(string(transcriptBytes), "\n", " ")
+	transcript = regexp.MustCompile(`\s+`).ReplaceAllString(transcript, " ")
+	transcript = strings.TrimSpace(transcript)
 
 	// Delete the .wav file
 	err = os.Remove(fileName)
@@ -71,10 +72,9 @@ func main() {
 		return
 	}
 
-	// If the format flag is set, format the transcript with an LLM
+	// If the format flag is set, format the transcript into paragraphs
 	if formatFlag {
-		// 1 token = ~4 characters. Allow for 3000 tokens per chunk
-		chunks := SplitTextIntoChunks(transcript, 12000)
+		paragraphs := SplitTranscriptIntoParagraphs(transcript, 3, 10, 0.3)
 
 		file, err := os.OpenFile("formatted_transcript.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 		if err != nil {
@@ -83,46 +83,11 @@ func main() {
 		}
 		defer file.Close()
 
-		for _, chunk := range chunks {
-			payload := fmt.Sprintf(`{"model":"llama3","system":"Split this text into paragraphs. Reply with the paragraphs only. Do not change the text at all.","prompt":%q,"stream":false,"options":{"num_ctx":8000,"temperature":0.1}}`, chunk)
-			req, _ := http.NewRequest("POST", "http://localhost:11434/api/generate", strings.NewReader(payload))
-			req.Header.Set("Content-Type", "application/json")
-
-			resp, err := http.DefaultClient.Do(req)
+		for _, paragraph := range paragraphs {
+			_, err = file.WriteString(paragraph + "\n\n")
 			if err != nil {
-				fmt.Printf("Error making request: %v\n", err)
+				fmt.Printf("Error writing to formatted transcript file: %v\n", err)
 				return
-			}
-			defer resp.Body.Close()
-
-			bodyBytes, err := io.ReadAll(resp.Body)
-			if err != nil {
-				fmt.Printf("Error reading response body: %v\n", err)
-				return
-			}
-			bodyString := string(bodyBytes)
-
-			if resp.StatusCode != http.StatusOK {
-				fmt.Println("Response Body:", bodyString)
-				fmt.Printf("Error: Ollama API unreachable or returned error. Status Code: %d\n", resp.StatusCode)
-				return
-			}
-
-			var result map[string]interface{}
-			if err := json.Unmarshal(bodyBytes, &result); err != nil {
-				fmt.Printf("Error decoding JSON response: %v\n", err)
-				return
-			}
-
-			if response, ok := result["response"].(string); ok {
-				fmt.Println(response)
-
-				// Append the formatted transcript to the file
-				_, err = file.WriteString(response + "\n\n")
-				if err != nil {
-					fmt.Printf("Error writing to formatted transcript file: %v\n", err)
-					return
-				}
 			}
 		}
 	}
