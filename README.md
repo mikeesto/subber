@@ -25,6 +25,8 @@ This command will:
 3. Format the transcript into paragraphs using topic analysis with TF-IDF
 4. Save the formatted transcript to `formatted_transcript.txt`
 
+[Some very rough benchmarks](https://gist.github.com/mikeesto/29c9cee43f95e0385b67ac83040a499e).
+
 ## Installation
 
 I'm still working on the best way to distribute this. For now, you can clone the repository, ensure you have the required dependencies installed, and update the `WhisperPath` and `ModelPath` constants in the code to match your system.
