@@ -11,8 +11,8 @@ import (
 )
 
 const (
-	WhisperPath = "/Users/michael/Code/whisper.cpp/main"
-	ModelPath   = "/Users/michael/Code/whisper.cpp/models/ggml-small.en.bin"
+	WhisperCLIPath = "/Users/michael/Code/whisper.cpp/build/bin/whisper-cli"
+	ModelPath      = "/Users/michael/Code/whisper.cpp/models/ggml-small.en.bin"
 )
 
 func main() {
@@ -45,7 +45,7 @@ func main() {
 
 	// Run whisper on the .wav file
 	fmt.Println("Running whisper...")
-	cmd := exec.Command(WhisperPath, "-m", ModelPath, "-f", fileName, "-otxt", "-of", "transcript")
+	cmd := exec.Command(WhisperCLIPath, "-m", ModelPath, "-f", fileName, "-otxt", "-of", "transcript")
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	err := cmd.Run()
